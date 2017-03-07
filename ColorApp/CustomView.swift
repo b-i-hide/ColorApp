@@ -8,36 +8,57 @@
 
 import UIKit
 
+protocol CustomViewDelegate {
+    func modal(color:UIColor)
+}
+
 class CustomView: UIView {
+    
+    var customDelegate:CustomViewDelegate?
+    let backgroundView = UIView()
+    let colorSelectView = UIView()
+    var colors: [UIColor] = [UIColor.red, UIColor.blue, UIColor.brown, UIColor.cyan, UIColor.green, UIColor.orange, UIColor.purple, UIColor.black, UIColor.yellow]
+    
 
     override init(frame: CGRect) {
         super.init(frame: frame)
+        
+        makeBackgroundView()
+        makeColorSelectView()
+        for i in 0...8 {
+            let blankSpace = CGFloat(5*(i+1))
+            let cellHeight = Int((colorSelectView.frame.height - 50) / 9)
+            let cellPositionY: CGFloat = CGFloat(cellHeight * i)
+            makeColorCell(color: colors[i], y: blankSpace + cellPositionY)
+        }
     }
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func makeBackgroundView(viewController: UIViewController) -> UIView {
-        let backgroundView = UIView()
-        backgroundView.frame = CGRect(x: 0, y: 0, width: viewController.view.frame.width, height: viewController.view.frame.height)
-//        これだとエラーでた。。
-//        backgroundView.backgroundColor = UIColor(red: 139, green: 139, blue: 139, alpha: 0.6)
-        backgroundView.backgroundColor = UIColor.gray
-        return backgroundView
+    func makeBackgroundView() {
+        backgroundView.frame = CGRect(x: 0, y: 0, width: frame.width, height: frame.height)
+        backgroundView.backgroundColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.6)
+        self.addSubview(backgroundView)
     }
     
-    func makeColorSelectView(bgView: UIView) -> UIView {
-        let colorSelectView = UIView()
-        colorSelectView.frame = CGRect(x: Int(bgView.frame.width / 6), y: 50, width: Int(bgView.frame.width / 6 * 4), height: Int(bgView.frame.height - 100))
+    func makeColorSelectView() {
+        colorSelectView.frame = CGRect(x: Int(backgroundView.frame.width / 6), y: 50, width: Int(backgroundView.frame.width / 6 * 4), height: 500)
         colorSelectView.backgroundColor = UIColor.white
-        return colorSelectView
+        backgroundView.addSubview(colorSelectView)
     }
     
-    func makeColorCell(colorSelectView: UIView, color: String, x: CGFloat, y: CGFloat) -> UIView {
+    func makeColorCell(color: UIColor, y: CGFloat){
         let colorCell = UIButton()
-        colorCell.backgroundColor = UIColor.UIcolor(color)
-        colorCell.frame = CGRect(x: x, y: y, width: colorSelectView.frame.width - 10, height: colorSelectView.frame.height / 9)
-        return colorCell
+        colorCell.backgroundColor = color
+        colorCell.frame = CGRect(x: 5, y: y, width: colorSelectView.frame.width - 10, height: (colorSelectView.frame.height - 50) / 9)
+        colorCell.addTarget(self, action: #selector(self.tapColorCell(sender:)), for: UIControlEvents.touchUpInside)
+        colorSelectView.addSubview(colorCell)
+    }
+    
+    func tapColorCell(sender: UIButton) {
+        customDelegate?.modal(color: sender.backgroundColor!)
+        self.removeFromSuperview()
     }
 }
