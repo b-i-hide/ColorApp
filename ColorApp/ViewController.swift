@@ -8,33 +8,38 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, CustomViewDelegate {
     
-    var colorView = CustomView()
+    let button = UIButton()
     
-
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.view.addSubview(colorView)
+        button.frame.size = CGSize(width: 100, height: 100)
+        button.center.x = self.view.center.x
+        button.center.y = self.view.center.y
+        button.backgroundColor = UIColor.red
+        button.addTarget(self, action: #selector(self.tapButton(sender:)), for: UIControlEvents.touchUpInside)
+        self.view.addSubview(button)
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
-    @IBAction func tapButton(_ sender: UIButton) {
-        let backgroundView = colorView.makeBackgroundView(viewController: self)
-        self.view.addSubview(backgroundView)
-        let colorSelectView = colorView.makeColorSelectView(bgView: backgroundView)
-        backgroundView.addSubview(colorSelectView)
-        for i in 1...9 {
-            var colors = ["red", "blue", "black", "green", "cyan", "yellow", "magenta","purple", "orange"]
-            let colorCell = colorView.makeColorCell(colorSelectView: colorSelectView, color: colors[i], x: 5, y: 5)
-            colorSelectView.addSubview(colorCell)
-        }
+    
+    func tapButton(sender: UIButton) {
+        showCutomView()
     }
-
+    
+    func showCutomView() {
+        let colorView = CustomView(frame: self.view.frame)
+        colorView.customDelegate = self
+        self.view.addSubview(colorView)
+    }
+    
+    func modal(color: UIColor) {
+        button.backgroundColor = color
+    }
 }
 
